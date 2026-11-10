@@ -19,6 +19,8 @@ PARTES = {
     "imgs_part_3.zip": "34dcdf8e-e5f1-4b35-aa0b-5135051ff852",
 }
 ZIP_ID = "zr7vgbcyr2"
+# tamanhos publicados pelo Mendeley (API de arquivos do dataset) para validar o download
+TAMANHOS = {"imgs_part_1.zip": 1245184680, "imgs_part_2.zip": 1126646990, "imgs_part_3.zip": 1220565093}
 
 linhas = [r for r in csv.DictReader(open(f"{RAIZ}/metadata.csv", encoding="utf-8")) if r["diagnostic"] in MAPA]
 por_img = {r["img_id"]: r for r in linhas}
@@ -28,8 +30,11 @@ achadas = {}
 for nome, fid in PARTES.items():
     print("baixando", nome, flush=True)
     zpath = f"{RAIZ}/{nome}"
-    os.system(f'curl -sL --retry 3 -o "{zpath}" "https://data.mendeley.com/public-files/datasets/{ZIP_ID}/files/{fid}/file_downloaded"')
-    print("tamanho", os.path.getsize(zpath), flush=True)
+    codigo = os.system(f'curl -sL --retry 3 -o "{zpath}" "https://data.mendeley.com/public-files/datasets/{ZIP_ID}/files/{fid}/file_downloaded"')
+    tam = os.path.getsize(zpath) if os.path.exists(zpath) else -1
+    if codigo != 0 or tam != TAMANHOS[nome]:
+        raise SystemExit(f"download incompleto de {nome}: código curl={codigo}, tamanho={tam}, esperado={TAMANHOS[nome]}")
+    print("tamanho", tam, "ok", flush=True)
     with zipfile.ZipFile(zpath) as z:
         for m in z.namelist():
             base = os.path.basename(m)

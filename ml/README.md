@@ -16,8 +16,12 @@ Observações de reprodutibilidade:
 
 Requisitos: PyTorch com CUDA, torchvision, scikit-learn, pillow. Os dados não estão no repositório.
 
-1. Pacote do atlas (`pacote/` com `manifest.csv`, `train/`, `val/`, `test/`), gerado a partir do PDF do atlas (`dados/build_atlas.py`, `dados/build_dataset.py`).
-2. PAD-UFES-20 (opcional): `python3 dados/preparar_pad.py /caminho/pad`.
+1. Pacote do atlas (`pacote/` com `manifest.csv`, `train/`, `val/`, `test/`), gerado a partir do PDF do atlas (`dados/build_atlas.py`, `dados/build_dataset.py`). As imagens do atlas não estão no repositório.
+2. Um comando faz a validação do atlas, o download e o processamento do PAD-UFES-20 e o manifesto mesclado:
+   ```bash
+   python3 dados/preparar_tudo.py --atlas /caminho/pacote --trabalho ./dados_treino
+   ```
+   Use `--pular-download` para reaproveitar um PAD já processado em `./dados_treino/pad`.
 3. Exemplo (configuração forte, com PAD para BCC, SCC e outras dermatoses):
    ```bash
    python3 treino/cv_treino.py --atlas /caminho/pacote --pad /caminho/pad --config forte --pesos inversa \
