@@ -56,6 +56,8 @@ def ler_atlas(raiz: Path):
     itens = []
     with open(raiz / "manifest.csv", encoding="utf-8") as f:
         for r in csv.DictReader(f):
+            if r["split"] not in ("train", "val", "test"):  # 'excluida' fica de fora
+                continue
             itens.append((raiz / r["arquivo"], IDX[r["classe"]], f"atlas:{r['pagina_pdf']}", r["split"]))
     return itens
 
@@ -184,7 +186,7 @@ def treinar_fold(args, treino_itens, val_itens, teste_itens, dev, log):
             else:
                 loss = perda(modelo(x), y)
             opt.zero_grad(set_to_none=True); loss.backward(); opt.step(); sched.step()
-            soma += float(loss) * x.size(0); n += x.size(0)
+            soma += loss.item() * x.size(0); n += x.size(0)
         log(f"  época {ep}/{args.epochs} perda={soma / max(n, 1):.4f} {time.time() - t0:.0f}s")
     # sem seleção de época: avaliação ao final, para não otimizar na própria validação
     p_val = prever(modelo, loader_val, dev)
@@ -214,6 +216,7 @@ def main():
     ap.add_argument("--folds", type=int, default=5)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--subamostra", type=int, default=0, help="só para teste de fumaça: N itens do pool e 20 do teste")
     ap.add_argument("--limitar-folds", type=int, default=0, help="só para teste rápido (0 = todos)")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
@@ -230,6 +233,9 @@ def main():
     atlas = ler_atlas(Path(args.atlas))
     pool = [it for it in atlas if it[3] in ("train", "val")]
     teste = [it for it in atlas if it[3] == "test"]
+    if args.subamostra:
+        pool = random.Random(args.seed).sample(pool, args.subamostra)
+        teste = teste[:20]
     log(f"atlas: pool={len(pool)} (train+val), teste={len(teste)}")
 
     pad_itens = []
