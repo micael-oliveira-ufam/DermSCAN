@@ -65,8 +65,22 @@ def preparar_pad(trabalho: Path, pular: bool, log) -> Path:
     return destino
 
 
+def checar_mapeamento_pad(pad: Path) -> dict:
+    """Recusa um PAD processado com o mapeamento antigo (ACK/SEK/NEV agrupados em outras_dermatoses)."""
+    info = json.load(open(pad / "mapeamento_pad.json", encoding="utf-8"))
+    mapa = info["mapa"]
+    individuais = {mapa.get(k) for k in ("ACK", "SEK", "NEV")}
+    if info.get("versao_mapeamento") != 2 or len(individuais) != 3 or "outras_dermatoses" in individuais:
+        raise SystemExit("PAD processado com o mapeamento ANTIGO (ACK/SEK/NEV em outras_dermatoses). "
+                         "Apague a pasta pad/ do diretório de trabalho e rode de novo, ou use o PAD-UFES-20-processado.tar.gz novo.")
+    cabecalho = open(pad / "manifesto_pad.csv", encoding="utf-8").readline().strip().split(",")
+    if "classe" not in cabecalho:
+        raise SystemExit("manifesto_pad.csv no formato antigo (coluna 'classe_atlas'); regenere o PAD.")
+    return mapa
+
+
 def mesclar(atlas_info: dict, pad: Path, pacote: Path, trabalho: Path, log) -> dict:
-    mapa_pad = json.load(open(pad / "mapeamento_pad.json", encoding="utf-8"))["mapa"]
+    mapa_pad = checar_mapeamento_pad(pad)
     saida = trabalho / "manifesto_mesclado.csv"
     linhas_pad = list(csv.DictReader(open(pad / "manifesto_pad.csv", encoding="utf-8")))
     with open(saida, "w", newline="", encoding="utf-8") as f:
@@ -75,7 +89,7 @@ def mesclar(atlas_info: dict, pad: Path, pacote: Path, trabalho: Path, log) -> d
         for r in atlas_info["linhas"]:
             w.writerow([str(pacote / r["arquivo"]), r["classe"], "atlas", r["split"], f"atlas:{r['pagina_pdf']}"])
         for r in linhas_pad:
-            w.writerow([str(pad / r["arquivo"]), r["classe_atlas"], "pad", "pad", f"pad:{r['patient_id']}"])
+            w.writerow([str(pad / r["arquivo"]), r["classe"], "pad", "pad", f"pad:{r['patient_id']}"])
     faltando = [r["caminho"] for r in csv.DictReader(open(saida, encoding="utf-8")) if not Path(r["caminho"]).exists()]
     if faltando: raise SystemExit(f"{len(faltando)} arquivos do manifesto mesclado não existem")
     cont = Counter((r["origem"], r["classe"]) for r in csv.DictReader(open(saida, encoding="utf-8")))

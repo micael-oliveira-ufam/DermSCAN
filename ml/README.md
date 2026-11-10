@@ -22,9 +22,12 @@ Requisitos: PyTorch com CUDA, torchvision, scikit-learn, pillow. Os dados não e
    python3 dados/preparar_tudo.py --atlas /caminho/pacote --trabalho ./dados_treino
    ```
    Use `--pular-download` para reaproveitar um PAD já processado em `./dados_treino/pad`.
-3. Exemplo (configuração forte, com PAD para BCC, SCC e outras dermatoses):
+3. Exemplo (configuração forte, com PAD: BCC, SCC e, como classes individuais, queratose actínica, queratose seborreica e nevo; 13 saídas):
    ```bash
    python3 treino/cv_treino.py --atlas /caminho/pacote --pad /caminho/pad --config forte --pesos inversa \
      --label-smoothing 0.1 --pad-max-por-classe 150 --out runs/forte_pad
+   # --pad-classes (padrão): carcinoma_basocelular,carcinoma_espinocelular,queratose_actinica,queratose_seborreica,nevo_melanocitico
+   # --balanceamento perda|sampler|ambos (padrão perda): onde aplicar os pesos de classe
+   # --pad-reservado 0.2 (padrão): 20% dos pacientes do PAD ficam fora de todo treino e avaliam as classes do PAD (resumo.json: pad_reservado)
    ```
    Baseline (sem PAD, sem pesos): `--config base --pesos nenhum --label-smoothing 0 --out runs/base`.

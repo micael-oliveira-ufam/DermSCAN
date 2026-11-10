@@ -6,13 +6,14 @@ import csv, hashlib, json, os, sys, zipfile, io  # noqa: E401
 from PIL import Image
 
 RAIZ = sys.argv[1] if len(sys.argv) > 1 else "/home/claude/pad"  # uso: python3 preparar_pad.py <pasta_de_saida>
-MAPA = {  # diagnóstico PAD -> classe do atlas (MEL excluído: sem classe equivalente)
-    "BCC": "carcinoma_basocelular",
-    "SCC": "carcinoma_espinocelular",
-    "ACK": "outras_dermatoses",   # decisão a confirmar com o usuário
-    "SEK": "outras_dermatoses",   # idem
-    "NEV": "outras_dermatoses",   # idem
+MAPA = {  # diagnóstico PAD -> classe de treino (MEL excluído: sem classe equivalente)
+    "BCC": "carcinoma_basocelular",      # classe já existente no atlas
+    "SCC": "carcinoma_espinocelular",    # classe já existente no atlas
+    "ACK": "queratose_actinica",         # classe própria (não existe no atlas)
+    "SEK": "queratose_seborreica",       # classe própria (não existe no atlas)
+    "NEV": "nevo_melanocitico",          # classe própria (não existe no atlas)
 }
+VERSAO_MAPEAMENTO = 2  # 1 = ACK/SEK/NEV agrupados em outras_dermatoses (obsoleto)
 PARTES = {
     "imgs_part_1.zip": "1cc2f71f-20a2-412d-b746-a9b9bc20c966",
     "imgs_part_2.zip": "559a60ed-5504-475d-996c-6a8bc253b5e7",
@@ -54,12 +55,12 @@ faltam = set(por_img) - set(achadas)
 print("sem imagem no zip:", len(faltam), flush=True)
 with open(f"{RAIZ}/manifesto_pad.csv", "w", newline="", encoding="utf-8") as f:
     w = csv.writer(f)
-    w.writerow(["arquivo", "classe_atlas", "diagnostico_pad", "patient_id", "lesion_id", "img_id", "sha256_jpeg"])
+    w.writerow(["arquivo", "classe", "diagnostico_pad", "patient_id", "lesion_id", "img_id", "sha256_jpeg"])
     for img, cls in sorted(achadas.items()):
         r = por_img[img]
         p = f"{RAIZ}/imgs/{cls}/{os.path.splitext(img)[0]}.jpg"
         h = hashlib.sha256(open(p, "rb").read()).hexdigest()
         w.writerow([f"imgs/{cls}/{os.path.splitext(img)[0]}.jpg", cls, r["diagnostic"], r["patient_id"], r["lesion_id"], img, h])
-json.dump({"mapa": MAPA, "excluidas_sem_imagem": sorted(faltam), "total": len(achadas)},
+json.dump({"versao_mapeamento": VERSAO_MAPEAMENTO, "mapa": MAPA, "excluidas_sem_imagem": sorted(faltam), "total": len(achadas)},
           open(f"{RAIZ}/mapeamento_pad.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("FIM", flush=True)
