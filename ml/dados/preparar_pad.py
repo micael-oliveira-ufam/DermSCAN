@@ -41,7 +41,7 @@ for nome, fid in PARTES.items():
             if base in por_img and base not in achadas:
                 r = por_img[base]
                 cls = MAPA[r["diagnostic"]]
-                destino = f"{RAIZ}/imgs/{cls}/{base}"
+                destino = f"{RAIZ}/imgs/{cls}/{os.path.splitext(base)[0]}.jpg"  # o conteúdo é JPEG
                 os.makedirs(os.path.dirname(destino), exist_ok=True)
                 with z.open(m) as f:
                     im = Image.open(io.BytesIO(f.read())).convert("RGB")
@@ -57,9 +57,9 @@ with open(f"{RAIZ}/manifesto_pad.csv", "w", newline="", encoding="utf-8") as f:
     w.writerow(["arquivo", "classe_atlas", "diagnostico_pad", "patient_id", "lesion_id", "img_id", "sha256_jpeg"])
     for img, cls in sorted(achadas.items()):
         r = por_img[img]
-        p = f"{RAIZ}/imgs/{cls}/{img}"
+        p = f"{RAIZ}/imgs/{cls}/{os.path.splitext(img)[0]}.jpg"
         h = hashlib.sha256(open(p, "rb").read()).hexdigest()
-        w.writerow([f"imgs/{cls}/{img}", cls, r["diagnostic"], r["patient_id"], r["lesion_id"], img, h])
+        w.writerow([f"imgs/{cls}/{os.path.splitext(img)[0]}.jpg", cls, r["diagnostic"], r["patient_id"], r["lesion_id"], img, h])
 json.dump({"mapa": MAPA, "excluidas_sem_imagem": sorted(faltam), "total": len(achadas)},
           open(f"{RAIZ}/mapeamento_pad.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("FIM", flush=True)
