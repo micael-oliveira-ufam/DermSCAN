@@ -141,13 +141,61 @@ async function classificarImagem(imagem) {
   return { logits, probs, ms };
 }
 
+// Baixa o modelo em stream e informa o progresso (bytes recebidos / total).
+// Se o servidor não informar o tamanho total, mostra só os MB recebidos.
+async function baixarModelo(url, aoProgredir) {
+  const resposta = await fetch(url);
+  if (!resposta.ok) throw new Error("HTTP " + resposta.status);
+  const total = Number(resposta.headers.get("content-length")) || 0;
+  if (!resposta.body || !resposta.body.getReader) {
+    const buffer = await resposta.arrayBuffer();
+    aoProgredir(buffer.byteLength, total || buffer.byteLength);
+    return new Uint8Array(buffer);
+  }
+  const leitor = resposta.body.getReader();
+  const partes = [];
+  let recebido = 0;
+  for (;;) {
+    const { done, value } = await leitor.read();
+    if (done) break;
+    partes.push(value);
+    recebido += value.byteLength;
+    aoProgredir(recebido, total);
+  }
+  const bytes = new Uint8Array(recebido);
+  let posicao = 0;
+  for (const parte of partes) {
+    bytes.set(parte, posicao);
+    posicao += parte.byteLength;
+  }
+  return bytes;
+}
+
+function atualizarProgresso(recebido, total) {
+  const mb = (n) => (n / 1000000).toFixed(1).replace(".", ",");
+  const barra = el("progresso");
+  if (total > 0) {
+    barra.max = total;
+    barra.value = recebido;
+    barra.hidden = false;
+    el("status").textContent =
+      "Baixando modelo: " + mb(recebido) + " de " + mb(total) + " MB (só na primeira vez).";
+  } else {
+    barra.hidden = true;
+    el("status").textContent = "Baixando modelo: " + mb(recebido) + " MB (só na primeira vez).";
+  }
+}
+
 async function carregarModelo() {
   try {
     info = await (await fetch(CFG.infoUrl)).json();
     ort.env.wasm.numThreads = 1; // GitHub Pages não envia COOP/COEP, logo sem SharedArrayBuffer
     // URL absoluta: o loader importa estes arquivos como módulos, e "vendor/" puro não resolve.
     ort.env.wasm.wasmPaths = new URL("vendor/", document.baseURI).href;
-    sessao = await ort.InferenceSession.create(CFG.modeloUrl, {
+    const bytesModelo = await baixarModelo(CFG.modeloUrl, atualizarProgresso);
+    el("status").textContent = "Inicializando o modelo…";
+    el("progresso").hidden = true;
+    sessao = await ort.InferenceSession.create(bytesModelo, {
       executionProviders: ["wasm"],
       graphOptimizationLevel: "all",
     });
