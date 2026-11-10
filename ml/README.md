@@ -11,3 +11,16 @@ Observações de reprodutibilidade:
 - Os scripts foram escritos para um diretório de trabalho com `atlas.pdf`, `imglist.txt`, `raw/` e `full.txt` (ver docstring de `build_atlas.py`); os caminhos podem precisar de ajuste.
 - Só o ViT-B/16 (seed 42) foi treinado, avaliado e exportado até agora.
 - A correção do `train_v2.py` para as arquiteturas Swin (argumento duplicado `stochastic_depth_prob`) **não foi executada**.
+
+## Rodar a validação cruzada (GPU)
+
+Requisitos: PyTorch com CUDA, torchvision, scikit-learn, pillow. Os dados não estão no repositório.
+
+1. Pacote do atlas (`pacote/` com `manifest.csv`, `train/`, `val/`, `test/`), gerado a partir do PDF do atlas (`dados/build_atlas.py`, `dados/build_dataset.py`).
+2. PAD-UFES-20 (opcional): `python3 dados/preparar_pad.py /caminho/pad`.
+3. Exemplo (configuração forte, com PAD para BCC, SCC e outras dermatoses):
+   ```bash
+   python3 treino/cv_treino.py --atlas /caminho/pacote --pad /caminho/pad --config forte --pesos inversa \
+     --label-smoothing 0.1 --pad-max-por-classe 150 --out runs/forte_pad
+   ```
+   Baseline (sem PAD, sem pesos): `--config base --pesos nenhum --label-smoothing 0 --out runs/base`.
