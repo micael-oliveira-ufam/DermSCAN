@@ -1,0 +1,72 @@
+{
+  "modelo": "ViT-B/16 (ImageNet IMAGENET1K_V1 + cabeça treinada), seed 42",
+  "arquivo": "vit_b16_int8.onnx",
+  "formato": "ONNX opset 17, quantização dinâmica int8 dos pesos",
+  "entrada": {
+    "nome": "imagem",
+    "formato": "float32 NCHW [1,3,224,224]",
+    "tamanho": 224,
+    "media": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "desvio": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "pre_processamento": [
+      "decodificar a imagem em RGB",
+      "redimensionar para 224x224 esticando, sem recorte",
+      "escalar para [0,1]",
+      "normalizar com média e desvio acima"
+    ]
+  },
+  "saida": {
+    "nome": "logits",
+    "formato": "float32 [1,10]"
+  },
+  "classes": [
+    "carcinoma_basocelular",
+    "carcinoma_espinocelular",
+    "esporotricose",
+    "hanseniase",
+    "leish_cutanea_outras_formas",
+    "leish_cutanea_ulcera",
+    "leish_mucosa",
+    "outras_dermatoses",
+    "tuberculose_e_micobacterioses",
+    "ulceras_vasculares"
+  ],
+  "nomes_exibicao": {
+    "carcinoma_basocelular": "Carcinoma basocelular",
+    "carcinoma_espinocelular": "Carcinoma espinocelular",
+    "esporotricose": "Esporotricose",
+    "hanseniase": "Hanseníase",
+    "leish_cutanea_outras_formas": "Leishmaniose cutânea (outras formas)",
+    "leish_cutanea_ulcera": "Leishmaniose cutânea (úlcera)",
+    "leish_mucosa": "Leishmaniose mucosa",
+    "outras_dermatoses": "Outras dermatoses",
+    "tuberculose_e_micobacterioses": "Tuberculose e micobacterioses",
+    "ulceras_vasculares": "Úlceras vasculares"
+  },
+  "calibracao": {
+    "temperatura": 1.524272084236145,
+    "metodo": "escala de temperatura, ajustada por NLL na validação; uso: softmax(logits / temperatura)"
+  },
+  "limiar_inconclusivo": 0.5,
+  "metricas_teste_int8_89_imagens": {
+    "acuracia": 0.618,
+    "acuracia_balanceada": 0.4976,
+    "macro_f1": 0.5097,
+    "ece": 0.1633
+  },
+  "metricas_teste_int8_calibrado": {
+    "acuracia": 0.618,
+    "acuracia_balanceada": 0.4976,
+    "macro_f1": 0.5097,
+    "ece": 0.0828
+  },
+  "aviso": "Ferramenta de apoio à pesquisa. Não é diagnóstico clínico. Pesos treinados com imagens do atlas OPAS (CC BY-NC-SA 3.0 IGO)."
+}

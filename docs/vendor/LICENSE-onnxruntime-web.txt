@@ -1,0 +1,2 @@
+onnxruntime-web 1.24.2 - licença MIT (texto completo: https://github.com/microsoft/onnxruntime/blob/main/LICENSE).
+Arquivos vendorizados: ort.wasm.min.js, ort-wasm-simd-threaded.wasm, ort-wasm-simd-threaded.mjs.

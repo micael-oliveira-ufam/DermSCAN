@@ -1,0 +1,26 @@
+# Dados do atlas (CC BY-NC-SA 3.0 IGO): nunca versionar
+atlas*/
+atlas.pdf
+*.pdf
+pacote/
+raw/
+manifest.csv
+dataset/
+**/test/*/*.jpg
+**/train/*/*.jpg
+**/val/*/*.jpg
+# Cópia do modelo para o app: gerada por tools/sync_model.sh (o original fica em docs/model/)
+app/assets/model/*.onnx
+# Builds e caches
+app/build/
+app/.dart_tool/
+app/.flutter-plugins*
+app/android/.gradle/
+app/android/local.properties
+app/android/**/GeneratedPluginRegistrant.java
+*.apk
+*.aab
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DermSCAN: triagem visual de lesões cutâneas</title>
+  <meta name="description" content="DermSCAN classifica fotos de lesões cutâneas, incluindo leishmaniose, direto no navegador. Ferramenta de apoio à pesquisa, não é diagnóstico.">
+  <meta name="theme-color" content="#0A2E2C">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DermSCAN">
+  <meta property="og:description" content="Triagem visual de lesões cutâneas, direto no navegador. Ferramenta de apoio à pesquisa, não é diagnóstico.">
+  <meta property="og:image" content="https://micael-oliveira-ufam.github.io/DermSCAN/assets/img/og-image-1200x630.png">
+  <meta property="og:url" content="https://micael-oliveira-ufam.github.io/DermSCAN/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="assets/fonts/Sora-700Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/ort.wasm.min.js"></script>
+</head>
+<body>
+  <a class="pular" href="#ferramenta">Ir para a ferramenta</a>
+
+  <header class="topo">
+    <div class="miolo topo-in">
+      <a class="marca" href="./" aria-label="DermSCAN, início">
+        <img class="logo logo-claro" src="assets/img/logotipo-claro.svg" alt="DermSCAN" height="32">
+        <img class="logo logo-escuro" src="assets/img/logotipo-escuro.svg" alt="" height="32" aria-hidden="true">
+      </a>
+      <nav aria-label="Seções">
+        <a href="#como">Como funciona</a>
+        <a href="#desempenho">Desempenho</a>
+        <a href="#creditos">Créditos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="heroi">
+      <div class="miolo heroi-in">
+        <div>
+          <p class="selo">Apoio à pesquisa · roda no seu navegador</p>
+          <h1>Triagem visual de lesões cutâneas.</h1>
+          <p class="lede">Envie uma foto e veja, em segundos, quais das 10 categorias do modelo são mais prováveis. A imagem não sai do seu aparelho.</p>
+        </div>
+        <img class="heroi-simbolo" src="assets/img/simbolo-escuro.svg" alt="" width="220" height="220" aria-hidden="true">
+      </div>
+    </section>
+
+    <div class="miolo pilha">
+      <section class="aviso" role="note">
+        <strong>Uso restrito à pesquisa.</strong>
+        O DermSCAN não é dispositivo médico e não substitui avaliação clínica nem exame laboratorial.
+        O modelo erra, e não reconheceu esporotricose nas 3 imagens de teste (ver <a href="#desempenho">Desempenho</a>).
+      </section>
+
+      <section id="ferramenta" class="cartao ferramenta" aria-labelledby="t-ferr">
+        <h2 id="t-ferr">Classificar uma imagem</h2>
+        <div class="entrada">
+          <label for="arquivo" class="botao">Selecionar imagem</label>
+          <input id="arquivo" type="file" accept="image/*" disabled>
+          <p id="status" role="status" aria-live="polite">Carregando modelo (87 MB, só na primeira vez)…</p>
+        </div>
+
+        <div class="duas" id="area-resultado">
+          <figure class="visualizacao" hidden id="bloco-imagem">
+            <img id="imagem" alt="Imagem selecionada para classificação">
+          </figure>
+          <div class="resultado" hidden id="bloco-resultado">
+            <h3>Resultado</h3>
+            <p id="principal"></p>
+            <ol id="ranking" class="ranking"></ol>
+            <p class="detalhe" id="detalhe"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="como" class="cartao" aria-labelledby="t-como">
+        <h2 id="t-como">Como funciona</h2>
+        <ol class="passos">
+          <li><b>Pré-processamento.</b> A imagem é decodificada em RGB, redimensionada para 224×224 (esticada, sem recorte) e normalizada.</li>
+          <li><b>Modelo.</b> Um ViT-B/16 com cabeça treinada para 10 classes, quantizado em int8 (87 MB), roda via onnxruntime-web (WebAssembly).</li>
+          <li><b>Calibração.</b> As probabilidades usam escala de temperatura (T = 1,524, ajustada na validação).</li>
+          <li><b>Resultado.</b> Se a maior probabilidade ficar abaixo de 50%, o resultado é marcado como inconclusivo. Esse limiar é uma escolha de interface, não foi validado clinicamente.</li>
+        </ol>
+        <p class="detalhe">Nenhuma foto é enviada a servidor: o site é estático e toda a inferência ocorre localmente.</p>
+      </section>
+
+      <section id="desempenho" class="cartao" aria-labelledby="t-desemp">
+        <h2 id="t-desemp">Desempenho e limitações</h2>
+        <p>Medido em 89 imagens de teste, com o modelo int8 usado aqui:</p>
+        <dl class="metricas">
+          <div><dt>Acurácia</dt><dd>61,8%</dd></div>
+          <div><dt>Acurácia balanceada</dt><dd>49,8%</dd></div>
+          <div><dt>F1 macro</dt><dd>0,510</dd></div>
+          <div><dt>ECE (calibrado)</dt><dd>0,083</dd></div>
+        </dl>
+        <ul>
+          <li>O conjunto de teste é pequeno (89 imagens, 2 a 3 por classe nas menores): as métricas têm incerteza grande.</li>
+          <li>Esporotricose: 0 de 3 reconhecidas no teste.</li>
+          <li>As imagens vêm de um único atlas, com fotos clínicas de qualidade variada. O desempenho em fotos de celular, outras peles e outros serviços não foi medido.</li>
+          <li>A quantização int8 é sensível a pequenas diferenças de pré-processamento; por isso a reamostragem do navegador replica a do PIL (diferença de até 1 nível de cor).</li>
+          <li>No navegador, em 13 imagens de teste, a classe prevista coincidiu com a referência em Python em 13 de 13.</li>
+        </ul>
+      </section>
+
+      <section id="creditos" class="cartao" aria-labelledby="t-cred">
+        <h2 id="t-cred">Créditos e licenças</h2>
+        <ul>
+          <li><b>Dados de treino:</b> atlas OPAS 2020, licenciado CC BY-NC-SA 3.0 IGO (uso não comercial, compartilhamento pela mesma licença). As imagens <b>não</b> são distribuídas neste projeto, apenas o modelo treinado.</li>
+          <li><b>Modelo-base:</b> ViT-B/16 do torchvision (pesos ImageNet).</li>
+          <li><b>Inferência:</b> onnxruntime-web, licença MIT.</li>
+          <li><b>Tipografia:</b> Sora, SIL Open Font License 1.1.</li>
+          <li><b>Código:</b> <a href="https://github.com/micael-oliveira-ufam/DermSCAN">github.com/micael-oliveira-ufam/DermSCAN</a>.</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <div class="miolo">
+      <p>DermSCAN · ferramenta de apoio à pesquisa. Não é diagnóstico clínico.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

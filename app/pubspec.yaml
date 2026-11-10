@@ -1,0 +1,56 @@
+name: dermscan
+description: "DermSCAN: triagem visual de lesões cutâneas, no aparelho. Apoio à pesquisa."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  onnxruntime: ^1.4.1
+  image_picker: ^1.2.4
+  image: ^4.12.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/model/modelo_info.json
+    - assets/model/vit_b16_int8.onnx
+  fonts:
+    - family: Sora
+      fonts:
+        - asset: assets/fonts/Sora_400Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Sora_600SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Sora_700Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Sora_800ExtraBold.ttf
+          weight: 800
+
+# Ícones: gerados a partir de brand/ (ver brand/BRAND.md). Cor de fundo = "tinta" #0A2E2C.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/brand/icone-1024.png
+  adaptive_icon_background: "#0A2E2C"
+  adaptive_icon_foreground: assets/brand/icone-foreground-1024.png
+  adaptive_icon_monochrome: assets/brand/icone-monocromatico-1024.png
+
+# Splash nativa (exibida pelo sistema antes do Flutter iniciar); a splash animada vem depois, em Dart.
+flutter_native_splash:
+  color: "#0A2E2C"
+  image: assets/brand/splash-simbolo-640.png
+  android_12:
+    color: "#0A2E2C"
+    image: assets/brand/splash-android12-960.png
+  android_gravity: center

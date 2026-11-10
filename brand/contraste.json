@@ -1,0 +1,112 @@
+[
+  {
+    "par": "texto tinta sobre areia",
+    "fg": "#0A2E2C",
+    "bg": "#F6F1EA",
+    "razao": 12.98,
+    "minimo": 4.5,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "texto floresta sobre areia",
+    "fg": "#0F5F5A",
+    "bg": "#F6F1EA",
+    "razao": 6.66,
+    "minimo": 4.5,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "texto branco sobre floresta (botão)",
+    "fg": "#FFFFFF",
+    "bg": "#0F5F5A",
+    "razao": 7.49,
+    "minimo": 4.5,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "texto areia sobre tinta",
+    "fg": "#F6F1EA",
+    "bg": "#0A2E2C",
+    "razao": 12.98,
+    "minimo": 4.5,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "texto água clara sobre tinta",
+    "fg": "#6FD3C7",
+    "bg": "#0A2E2C",
+    "razao": 8.21,
+    "minimo": 4.5,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "texto âmbar sobre areia (aviso)",
+    "fg": "#8A4B08",
+    "bg": "#F6F1EA",
+    "razao": 6.05,
+    "minimo": 4.5,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "gráfico floresta sobre areia (barras, ícones)",
+    "fg": "#0F5F5A",
+    "bg": "#F6F1EA",
+    "razao": 6.66,
+    "minimo": 3.0,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "gráfico coral sobre tinta (lesão na lente)",
+    "fg": "#E8704A",
+    "bg": "#0A2E2C",
+    "razao": 4.76,
+    "minimo": 3.0,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "gráfico água clara sobre floresta",
+    "fg": "#6FD3C7",
+    "bg": "#0F5F5A",
+    "razao": 4.21,
+    "minimo": 3.0,
+    "uso": "permitido",
+    "atinge_minimo": true,
+    "ok": true
+  },
+  {
+    "par": "gráfico água sobre areia",
+    "fg": "#17A398",
+    "bg": "#F6F1EA",
+    "razao": 2.78,
+    "minimo": 3.0,
+    "uso": "evitar",
+    "atinge_minimo": false,
+    "ok": true
+  },
+  {
+    "par": "gráfico coral sobre areia",
+    "fg": "#E8704A",
+    "bg": "#F6F1EA",
+    "razao": 2.73,
+    "minimo": 3.0,
+    "uso": "evitar",
+    "atinge_minimo": false,
+    "ok": true
+  }
+]
