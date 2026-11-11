@@ -45,14 +45,25 @@ if [ ! -d "$VENV" ]; then
   executar "$PYTHON" -m venv "$VENV"
 fi
 PY="$VENV/bin/python"
+# Instalação com progresso visível (sem -q). No Linux, o torch do PyPI traz a pilha CUDA da NVIDIA
+# (cuDNN, cuBLAS, NCCL etc.): são vários GB. Para baixar só a build CPU ou uma build CUDA específica,
+# defina TORCH_INDEX_URL, por exemplo: TORCH_INDEX_URL=https://download.pytorch.org/whl/cu124
+TORCH_INDEX_URL="${TORCH_INDEX_URL:-}"
 if [ "$DRY_RUN" != "1" ] && ! "$PY" -c "import torch, torchvision, sklearn, PIL" >/dev/null 2>&1; then
-  log "instalando dependências (requirements.txt do pacote)"
-  "$PY" -m pip install -q --upgrade pip
-  if [ -f "$HERE/requirements.txt" ]; then
-    "$PY" -m pip install -q -r "$HERE/requirements.txt" || { echo "ERRO: falha ao instalar dependências" >&2; exit 1; }
-  else
-    "$PY" -m pip install -q torch torchvision scikit-learn pillow numpy || exit 1
+  log "instalando dependências (pode levar vários minutos; o progresso aparece abaixo)"
+  "$PY" -m pip install --progress-bar on --upgrade pip || { echo "ERRO: falha ao atualizar o pip" >&2; exit 1; }
+  if [ -n "$TORCH_INDEX_URL" ]; then
+    log "instalando torch/torchvision do índice $TORCH_INDEX_URL"
+    "$PY" -m pip install --progress-bar on --index-url "$TORCH_INDEX_URL" torch torchvision \
+      || { echo "ERRO: falha ao instalar torch/torchvision de $TORCH_INDEX_URL" >&2; exit 1; }
   fi
+  if [ -f "$HERE/requirements.txt" ]; then
+    "$PY" -m pip install --progress-bar on -r "$HERE/requirements.txt" \
+      || { echo "ERRO: falha ao instalar dependências (veja a saída acima)" >&2; exit 1; }
+  else
+    "$PY" -m pip install --progress-bar on torch torchvision scikit-learn pillow numpy || exit 1
+  fi
+  log "dependências instaladas"
 fi
 
 # ---------------------------------------------------------------- 2. GPU
@@ -86,8 +97,9 @@ rodar() {
     log "rodada '$nome' já concluída; pulando"
     return
   fi
-  log "rodada '$nome' iniciada"
-  if executar "$PY" "$HERE/treino/cv_treino.py" --atlas "$ATLAS_DIR" "$@" --out "$RUNS/$nome" > "$LOGS/$nome.log" 2>&1; then
+  log "rodada '$nome' iniciada (acompanhe as épocas abaixo; cópia completa em $LOGS/$nome.log)"
+  # tee: a saída aparece no terminal e também fica no arquivo; pipefail preserva o código de saída do treino
+  if executar "$PY" -u "$HERE/treino/cv_treino.py" --atlas "$ATLAS_DIR" "$@" --out "$RUNS/$nome" 2>&1 | tee "$LOGS/$nome.log"; then
     log "rodada '$nome' concluída"
   else
     log "ERRO na rodada '$nome' (veja $LOGS/$nome.log)"
