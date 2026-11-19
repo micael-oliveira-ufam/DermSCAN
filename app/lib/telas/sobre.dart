@@ -35,6 +35,12 @@ class TelaSobre extends StatelessWidget {
             'Triagem visual de lesões cutâneas, incluindo leishmaniose, em 10 categorias. Ferramenta de apoio à pesquisa; não é diagnóstico.',
             'A imagem é processada somente neste aparelho. Nenhuma foto é enviada a servidor.',
           ]),
+          secao('Dados clínicos (opcional)', const [
+            'Ficam somente neste aparelho, criptografados com AES-256-GCM; a chave fica no Android Keystore e é apagada junto com os dados. Nada é enviado, exportado ou incluído em cópia de segurança do Android.',
+            'O indicador clínico-epidemiológico aplica por regras a definição de caso suspeito do Manual de Vigilância da Leishmaniose Tegumentar (Ministério da Saúde, 2017). Não é probabilidade, não é escore validado e não altera o resultado da IA.',
+            'Os campos são estruturados e validados. O texto livre (município e observações) é só anotação: não entra em regra nem em modelo, e este aplicativo não usa modelo de linguagem.',
+            'Coletar, compartilhar ou publicar dados de pacientes em pesquisa exige termo de consentimento e aprovação de comitê de ética.',
+          ]),
           secao('Limitações conhecidas', const [
             'Medido em 89 imagens de teste: acurácia 61,8%, acurácia balanceada 49,8%, F1 macro 0,510. Conjunto pequeno, incerteza grande.',
             'Esporotricose: 0 de 3 imagens reconhecidas no teste.',
