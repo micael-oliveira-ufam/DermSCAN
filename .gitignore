@@ -24,3 +24,6 @@ node_modules/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Saída de build do Gradle (relatórios gerados)
+app/android/build/
