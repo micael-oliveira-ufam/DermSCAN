@@ -68,5 +68,13 @@
     "macro_f1": 0.5097,
     "ece": 0.0828
   },
-  "aviso": "Ferramenta de apoio à pesquisa. Não é diagnóstico clínico. Pesos treinados com imagens do atlas OPAS (CC BY-NC-SA 3.0 IGO)."
+  "aviso": "Ferramenta de apoio à pesquisa. Não é diagnóstico clínico. Pesos treinados com imagens do atlas OPAS (CC BY-NC-SA 3.0 IGO).",
+  "versao_arquivo": {
+    "versao": 2,
+    "sha256_atual": "48c788f73adc128247a5e530acedbe343ba0386987a955374c7d9e60310fad2c",
+    "sha256_versao_1": "e31f35506bf0ac9e5a6831fe3026b1eda06ca9a08eed9e0f39853f6692267a81",
+    "alteracao": "O único nó ConvInteger (patch embedding conv_proj) foi substituído por Conv em float32 com o mesmo peso dequantizado e a mesma entrada dequantizada. Motivo: o runtime Android do ONNX Runtime não tem kernel para ConvInteger(10) (erro 'Could not find an implementation for ConvInteger(10)'). Os demais nós são idênticos. Script: ml/exportacao/remover_convinteger.py.",
+    "metricas_referem_se_a": "versao_1",
+    "observacao": "As métricas de teste acima foram medidas na versão 1. A versão 2 não foi reavaliada no conjunto de teste (dados não disponíveis neste ambiente); a equivalência foi verificada apenas numericamente."
+  }
 }
